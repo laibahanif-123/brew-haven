@@ -1,0 +1,26 @@
+@import "tailwindcss";
+
+@theme {
+  --color-espresso: #18110c;
+  --color-espresso-2: #241a13;
+  --color-cream: #f4ead9;
+  --color-cream-dim: #cdbfa8;
+  --color-crema: #d9a54c;
+  --color-crema-soft: #e8c688;
+  --color-rust: #a1402b;
+  --color-rust-deep: #7c2f1f;
+
+  --font-display: "Fraunces", serif;
+  --font-body: "Work Sans", sans-serif;
+  --font-mono: "Space Mono", monospace;
+}
+
+body {
+  background: var(--color-espresso);
+  color: var(--color-cream);
+}
+
+@keyframes scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
