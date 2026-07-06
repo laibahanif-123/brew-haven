@@ -1,10 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import api from "../../services/api";
-import io from "socket.io-client";
-import { FiTrash2, FiEdit, FiX } from "react-icons/fi";
-
-const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || "http://localhost:5000";
-const socket = io(SOCKET_URL);
+import { FiTrash2, FiEdit, FiX, FiRefreshCw } from "react-icons/fi";
 
 export default function AdminOrders() {
   const [orders, setOrders] = useState([]);
@@ -16,56 +12,31 @@ export default function AdminOrders() {
     address: "",
     city: ""
   });
+  const intervalRef = useRef(null);
+
+  const fetchOrders = async () => {
+    try {
+      const { data } = await api.get("/orders");
+      setOrders(data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        const { data } = await api.get("/orders");
-        setOrders(data);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchOrders();
-
-    // Socket listeners for real-time updates
-    socket.on("newOrder", (order) => {
-      // Add the new order at the top
-      setOrders((prev) => [order, ...prev]);
-    });
-
-    socket.on("orderStatusUpdated", (updatedOrder) => {
-      setOrders((prev) =>
-        prev.map((o) => (o._id === updatedOrder._id ? updatedOrder : o))
-      );
-    });
-
-    socket.on("orderDeleted", (deletedOrderId) => {
-      setOrders((prev) => prev.filter((o) => o._id !== deletedOrderId));
-    });
-
-    socket.on("orderDetailsUpdated", (updatedOrder) => {
-      setOrders((prev) =>
-        prev.map((o) => (o._id === updatedOrder._id ? updatedOrder : o))
-      );
-    });
-
-    return () => {
-      socket.off("newOrder");
-      socket.off("orderStatusUpdated");
-      socket.off("orderDeleted");
-      socket.off("orderDetailsUpdated");
-    };
+    // Poll every 5 seconds for new orders
+    intervalRef.current = setInterval(fetchOrders, 5000);
+    return () => clearInterval(intervalRef.current);
   }, []);
 
   const handleDeleteOrder = async (orderId) => {
     if (window.confirm("Are you sure you want to delete this order?")) {
       try {
         await api.delete(`/orders/${orderId}`);
-        // Socket will handle UI update, or fallback:
-        // setOrders(prev => prev.filter(o => o._id !== orderId));
+        setOrders(prev => prev.filter(o => o._id !== orderId));
       } catch (err) {
         console.error("Failed to delete order", err);
       }
@@ -75,6 +46,9 @@ export default function AdminOrders() {
   const handleStatusChange = async (orderId, newStatus) => {
     try {
       await api.put(`/orders/${orderId}/status`, { status: newStatus });
+      setOrders(prev =>
+        prev.map(o => o._id === orderId ? { ...o, status: newStatus } : o)
+      );
     } catch (err) {
       console.error(err);
     }
@@ -101,6 +75,12 @@ export default function AdminOrders() {
           city: editFormData.city,
         }
       });
+      setOrders(prev =>
+        prev.map(o => o._id === editingOrder._id
+          ? { ...o, shippingAddress: { ...o.shippingAddress, ...editFormData } }
+          : o
+        )
+      );
       setEditingOrder(null);
     } catch (err) {
       console.error("Failed to update order details", err);
@@ -117,6 +97,13 @@ export default function AdminOrders() {
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
           <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
         </span>
+        <button
+          onClick={fetchOrders}
+          title="Refresh now"
+          className="ml-auto p-2 rounded-lg bg-cream/5 text-cream-dim hover:text-cream hover:bg-cream/10 transition-colors"
+        >
+          <FiRefreshCw size={18} />
+        </button>
       </h1>
 
       <div className="space-y-4">
@@ -156,14 +143,14 @@ export default function AdminOrders() {
                 <option value="Delivered">Delivered</option>
                 <option value="Cancelled">Cancelled</option>
               </select>
-              <button 
+              <button
                 onClick={() => openEditModal(order)}
                 className="p-2.5 rounded-lg bg-blue-500/10 text-blue-500 border border-blue-500/30 hover:bg-blue-500 hover:text-white transition-colors"
                 title="Edit Order"
               >
                 <FiEdit size={16} />
               </button>
-              <button 
+              <button
                 onClick={() => handleDeleteOrder(order._id)}
                 className="p-2.5 rounded-lg bg-red-500/10 text-red-500 border border-red-500/30 hover:bg-red-500 hover:text-white transition-colors"
                 title="Delete Order"
@@ -191,7 +178,7 @@ export default function AdminOrders() {
             <form onSubmit={handleEditSubmit} className="p-6 space-y-4">
               <div>
                 <label className="block font-mono text-xs text-cream-dim mb-1.5 uppercase tracking-widest">Name</label>
-                <input 
+                <input
                   type="text" required
                   value={editFormData.name} onChange={e => setEditFormData({...editFormData, name: e.target.value})}
                   className="w-full bg-espresso/50 border border-cream/15 px-4 py-2.5 rounded text-sm outline-none focus:border-crema text-cream"
@@ -199,7 +186,7 @@ export default function AdminOrders() {
               </div>
               <div>
                 <label className="block font-mono text-xs text-cream-dim mb-1.5 uppercase tracking-widest">Phone</label>
-                <input 
+                <input
                   type="text" required
                   value={editFormData.phone} onChange={e => setEditFormData({...editFormData, phone: e.target.value})}
                   className="w-full bg-espresso/50 border border-cream/15 px-4 py-2.5 rounded text-sm outline-none focus:border-crema text-cream"
@@ -207,7 +194,7 @@ export default function AdminOrders() {
               </div>
               <div>
                 <label className="block font-mono text-xs text-cream-dim mb-1.5 uppercase tracking-widest">Address</label>
-                <input 
+                <input
                   type="text" required
                   value={editFormData.address} onChange={e => setEditFormData({...editFormData, address: e.target.value})}
                   className="w-full bg-espresso/50 border border-cream/15 px-4 py-2.5 rounded text-sm outline-none focus:border-crema text-cream"
@@ -215,7 +202,7 @@ export default function AdminOrders() {
               </div>
               <div>
                 <label className="block font-mono text-xs text-cream-dim mb-1.5 uppercase tracking-widest">City</label>
-                <input 
+                <input
                   type="text" required
                   value={editFormData.city} onChange={e => setEditFormData({...editFormData, city: e.target.value})}
                   className="w-full bg-espresso/50 border border-cream/15 px-4 py-2.5 rounded text-sm outline-none focus:border-crema text-cream"

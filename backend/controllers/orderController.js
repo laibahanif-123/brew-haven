@@ -16,12 +16,6 @@ const createOrder = async (req, res) => {
       totalPrice,
     });
 
-    const io = req.app.get("io");
-    if (io) {
-      const populatedOrder = await Order.findById(order._id).populate("user", "name email");
-      io.emit("newOrder", populatedOrder);
-    }
-
     res.status(201).json(order);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -53,12 +47,6 @@ const updateOrderStatus = async (req, res) => {
 
     order.status = req.body.status;
     const updatedOrder = await order.save();
-    
-    const io = req.app.get("io");
-    if (io) {
-      io.emit("orderStatusUpdated", await Order.findById(updatedOrder._id).populate("user", "name email"));
-    }
-
     res.json(updatedOrder);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -71,12 +59,6 @@ const deleteOrder = async (req, res) => {
     if (!order) return res.status(404).json({ message: "Order not found" });
 
     await order.deleteOne();
-    
-    const io = req.app.get("io");
-    if (io) {
-      io.emit("orderDeleted", req.params.id);
-    }
-
     res.json({ message: "Order removed" });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -91,19 +73,13 @@ const updateOrderDetails = async (req, res) => {
     if (req.body.shippingAddress) {
       order.shippingAddress = {
         ...order.shippingAddress,
-        ...req.body.shippingAddress
+        ...req.body.shippingAddress,
       };
     }
-    
+
     if (req.body.paymentMethod) order.paymentMethod = req.body.paymentMethod;
 
     const updatedOrder = await order.save();
-    
-    const io = req.app.get("io");
-    if (io) {
-      io.emit("orderDetailsUpdated", await Order.findById(updatedOrder._id).populate("user", "name email"));
-    }
-
     res.json(updatedOrder);
   } catch (error) {
     res.status(500).json({ message: error.message });
