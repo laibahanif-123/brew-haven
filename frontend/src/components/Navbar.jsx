@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { FiShoppingBag, FiMenu, FiX } from "react-icons/fi";
+import { FiShoppingBag, FiMenu, FiX, FiSettings } from "react-icons/fi";
 import { useState } from "react";
 import { useCartStore } from "../store/cartStore";
 import { useAuthStore } from "../store/authStore";
@@ -64,8 +64,12 @@ export default function Navbar() {
             Logout
           </button>
           {userInfo?.isAdmin && (
-            <Link to="/admin" className="font-mono text-[10px] uppercase tracking-widest text-cream-dim hover:text-emerald-400 transition-colors">
-              Admin
+            <Link
+              to="/admin"
+              title="Admin Dashboard"
+              className="relative flex items-center justify-center w-8 h-8 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500 hover:text-white transition-all duration-200"
+            >
+              <FiSettings size={15} />
             </Link>
           )}
           <Link to="/cart" className="relative text-cream hover:text-crema transition">
@@ -124,11 +128,12 @@ export default function Navbar() {
             </button>
           )}
           {userInfo?.isAdmin && (
-            <Link 
-              to="/admin" 
-              onClick={() => setIsMobileMenuOpen(false)} 
-              className="font-mono text-xs tracking-widest text-emerald-400 uppercase"
+            <Link
+              to="/admin"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="flex items-center gap-3 font-mono text-xs tracking-widest text-emerald-400 uppercase hover:text-emerald-300 transition"
             >
+              <FiSettings size={16} />
               Admin Dashboard
             </Link>
           )}

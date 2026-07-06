@@ -3,7 +3,8 @@ import api from "../../services/api";
 import io from "socket.io-client";
 import { FiTrash2, FiEdit, FiX } from "react-icons/fi";
 
-const socket = io("http://localhost:5000");
+const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || "http://localhost:5000";
+const socket = io(SOCKET_URL);
 
 export default function AdminOrders() {
   const [orders, setOrders] = useState([]);
