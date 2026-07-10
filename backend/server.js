@@ -11,6 +11,9 @@ const app = express();
 
 const allowedOrigins = [
   "http://localhost:5173",
+  "https://brew-haven-one.vercel.app",
+  "https://brew-haven-ehzj.vercel.app",
+  "https://brew-haven-c8gi.vercel.app",
   process.env.FRONTEND_URL,
 ].filter(Boolean);
 
@@ -38,7 +41,20 @@ app.get("/", (req, res) => {
   res.send("☕ Brew Haven API is running...");
 });
 
-// For local dev
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({ success: false, message: `Route not found: ${req.originalUrl}` });
+});
+
+// Error handler
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(err.statusCode || 500).json({
+    success: false,
+    message: err.message || "Internal server error",
+  });
+});
+
 if (process.env.NODE_ENV !== "production") {
   const PORT = process.env.PORT || 5000;
   app.listen(PORT, () => {
