@@ -1,4 +1,5 @@
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
+import { FiShoppingBag, FiPackage, FiPlusCircle, FiSettings } from "react-icons/fi";
 import { useAuthStore } from "../../store/authStore";
 
 export default function AdminDashboard() {
@@ -7,9 +8,12 @@ export default function AdminDashboard() {
   const { userInfo, logout } = useAuthStore();
 
   const navs = [
-    { name: "Live Orders", path: "/admin/orders" },
-    { name: "All Products", path: "/admin/products" },
-    { name: "Add Product", path: "/admin/products/add" },
+    { name: "Live Orders", path: "/admin/orders", icon: <FiShoppingBag size={15} /> },
+    { name: "All Products", path: "/admin/products", icon: <FiPackage size={15} /> },
+    { name: "Add Product", path: "/admin/products/add", icon: <FiPlusCircle size={15} /> },
+  ];
+  const bottomNavs = [
+    { name: "Settings", path: "/admin/settings", icon: <FiSettings size={15} /> },
   ];
 
   const handleLogout = () => {
@@ -27,19 +31,39 @@ export default function AdminDashboard() {
         </div>
         
         <nav className="flex-1 p-6 flex flex-col gap-2 overflow-y-auto">
+          <p className="font-mono text-[9px] uppercase tracking-widest text-cream/20 px-2 mb-2">Navigation</p>
           {navs.map((nav) => (
             <Link
               key={nav.name}
               to={nav.path}
-              className={`font-mono text-xs uppercase tracking-wider px-4 py-3.5 rounded-lg transition-all duration-300 ${
-                location.pathname.startsWith(nav.path)
+              className={`flex items-center gap-3 font-mono text-xs uppercase tracking-wider px-4 py-3.5 rounded-lg transition-all duration-300 ${
+                location.pathname === nav.path
                   ? "bg-crema text-espresso font-bold shadow-md"
                   : "text-cream-dim hover:text-cream hover:bg-cream/5"
               }`}
             >
+              {nav.icon}
               {nav.name}
             </Link>
           ))}
+
+          <div className="mt-auto pt-4 border-t border-cream/8">
+            <p className="font-mono text-[9px] uppercase tracking-widest text-cream/20 px-2 mb-2 mt-2">System</p>
+            {bottomNavs.map((nav) => (
+              <Link
+                key={nav.name}
+                to={nav.path}
+                className={`flex items-center gap-3 font-mono text-xs uppercase tracking-wider px-4 py-3.5 rounded-lg transition-all duration-300 ${
+                  location.pathname === nav.path
+                    ? "bg-crema text-espresso font-bold shadow-md"
+                    : "text-cream-dim hover:text-cream hover:bg-cream/5"
+                }`}
+              >
+                {nav.icon}
+                {nav.name}
+              </Link>
+            ))}
+          </div>
         </nav>
 
         <div className="p-6 border-t border-cream/10">

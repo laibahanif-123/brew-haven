@@ -14,6 +14,7 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminOrders from "./pages/admin/AdminOrders";
 import AdminProducts from "./pages/admin/AdminProducts";
 import AdminAddProduct from "./pages/admin/AdminAddProduct";
+import AdminSettings from "./pages/admin/AdminSettings";
 
 import UserLayout from "./pages/user/UserLayout";
 import DashboardHome from "./pages/user/DashboardHome";
@@ -85,6 +86,7 @@ function App() {
             <Route path="products" element={<AdminProducts />} />
             <Route path="products/add" element={<AdminAddProduct />} />
             <Route path="products/edit/:id" element={<AdminAddProduct />} />
+            <Route path="settings" element={<AdminSettings />} />
           </Route>
         </Route>
       </Routes>

@@ -5,6 +5,7 @@ import Menu from "../components/Menu";
 import Story from "../components/Story";
 import Gallery from "../components/Gallery";
 import Testimonial from "../components/Testimonial";
+import HowItWorks from "../components/HowItWorks";
 import Visit from "../components/Visit";
 
 export default function Home() {
@@ -17,6 +18,7 @@ export default function Home() {
       <Story />
       <Gallery />
       <Testimonial />
+      <HowItWorks />
       <Visit />
     </>
   );
