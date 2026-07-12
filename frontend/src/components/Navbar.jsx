@@ -57,12 +57,12 @@ export default function Navbar() {
 
         {/* Desktop Actions */}
         <div className="hidden md:flex items-center gap-5">
-          <button 
-            onClick={() => logout()}
-            className="font-mono text-[10px] uppercase tracking-widest text-cream-dim hover:text-rust transition-colors"
+          <Link 
+            to="/dashboard"
+            className="font-mono text-[10px] uppercase tracking-widest text-cream-dim hover:text-crema transition-colors"
           >
-            Logout
-          </button>
+            Dashboard
+          </Link>
           {userInfo?.isAdmin && (
             <Link
               to="/admin"
@@ -120,12 +120,13 @@ export default function Navbar() {
         
         <div className="mt-10 flex flex-col gap-5 border-t border-cream/10 pt-8">
           {userInfo && (
-            <button 
-              onClick={() => { logout(); setIsMobileMenuOpen(false); }} 
-              className="text-left font-mono text-xs tracking-widest text-cream-dim hover:text-rust transition uppercase"
+            <Link 
+              to="/dashboard"
+              onClick={() => setIsMobileMenuOpen(false)} 
+              className="text-left font-mono text-xs tracking-widest text-cream-dim hover:text-crema transition uppercase"
             >
-              Logout
-            </button>
+              Dashboard
+            </Link>
           )}
           {userInfo?.isAdmin && (
             <Link

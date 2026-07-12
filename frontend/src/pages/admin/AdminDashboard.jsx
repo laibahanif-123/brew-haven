@@ -7,7 +7,9 @@ export default function AdminDashboard() {
   const { userInfo, logout } = useAuthStore();
 
   const navs = [
-    { name: "Live Orders", path: "/admin/orders" }
+    { name: "Live Orders", path: "/admin/orders" },
+    { name: "All Products", path: "/admin/products" },
+    { name: "Add Product", path: "/admin/products/add" },
   ];
 
   const handleLogout = () => {

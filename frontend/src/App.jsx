@@ -12,6 +12,13 @@ import OrderSuccess from "./pages/OrderSuccess";
 import ProductDetails from "./pages/ProductDetails";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminOrders from "./pages/admin/AdminOrders";
+import AdminProducts from "./pages/admin/AdminProducts";
+import AdminAddProduct from "./pages/admin/AdminAddProduct";
+
+import UserLayout from "./pages/user/UserLayout";
+import DashboardHome from "./pages/user/DashboardHome";
+import OrderHistory from "./pages/user/OrderHistory";
+import AccountDetails from "./pages/user/AccountDetails";
 
 const ProtectedLayout = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -61,6 +68,13 @@ function App() {
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/order-success" element={<OrderSuccess />} />
           <Route path="/product/:id" element={<ProductDetails />} />
+          
+          {/* User Dashboard Routes */}
+          <Route element={<UserLayout />}>
+            <Route path="/dashboard" element={<DashboardHome />} />
+            <Route path="/dashboard/orders" element={<OrderHistory />} />
+            <Route path="/dashboard/account" element={<AccountDetails />} />
+          </Route>
         </Route>
 
         {/* Admin Routes (No Navbar/Footer) */}
@@ -68,6 +82,9 @@ function App() {
           <Route path="/admin" element={<AdminDashboard />}>
             <Route index element={<Navigate to="/admin/orders" replace />} />
             <Route path="orders" element={<AdminOrders />} />
+            <Route path="products" element={<AdminProducts />} />
+            <Route path="products/add" element={<AdminAddProduct />} />
+            <Route path="products/edit/:id" element={<AdminAddProduct />} />
           </Route>
         </Route>
       </Routes>
