@@ -1,35 +1,27 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/authStore";
 import api from "../services/api";
+import { FiUser, FiMail, FiPhone, FiLock, FiEye, FiEyeOff, FiArrowRight } from "react-icons/fi";
 
 export default function Register() {
   const navigate = useNavigate();
-  const login = useAuthStore((state) => state.login);
+  const login    = useAuthStore((s) => s.login);
+  const imgRef   = useRef(null);
+
   const [formData, setFormData] = useState({
-    fullName: "",
-    email: "",
-    phone: "",
-    password: "",
-    confirmPassword: "",
+    fullName: "", email: "", phone: "", password: "", confirmPassword: "",
   });
-  const [error, setError] = useState("");
+  const [showPass,    setShowPass]    = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [error,   setError]   = useState("");
   const [loading, setLoading] = useState(false);
-  const imgRef = useRef(null);
+  const [mounted, setMounted] = useState(false);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      if (imgRef.current) {
-        imgRef.current.style.transform = `translateY(${window.scrollY * 0.2}px)`;
-      }
-    };
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  useEffect(() => { setMounted(true); }, []);
 
-  const handleChange = (e) => {
-    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-  };
+  const handleChange = (e) =>
+    setFormData((p) => ({ ...p, [e.target.name]: e.target.value }));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -45,260 +37,238 @@ export default function Register() {
     setLoading(true);
     try {
       const { data } = await api.post("/users/register", {
-        name: formData.fullName,
-        email: formData.email,
-        phone: formData.phone,
+        name:     formData.fullName,
+        email:    formData.email,
+        phone:    formData.phone,
         password: formData.password,
       });
       localStorage.setItem("token", data.token);
       login(data);
       navigate("/");
     } catch (err) {
-      setError(err.response?.data?.message || "Error creating account. Please try again.");
+      setError(err.response?.data?.message || "Error creating account. Try again.");
       setLoading(false);
     }
   };
 
-  const perks = [
-    { icon: "☕", title: "Order Ahead", desc: "Skip the queue, pick up hot." },
-    { icon: "📦", title: "Track Orders", desc: "Live delivery updates." },
-    { icon: "❤️", title: "Save Favourites", desc: "Your usual, one tap away." },
-    { icon: "🎁", title: "Earn Rewards", desc: "Beans with every purchase." },
-  ];
-
   return (
-    <section className="relative min-h-screen flex items-center overflow-hidden">
-      {/* ── Parallax Background ── */}
-      <div className="absolute inset-0 overflow-hidden">
+    <div className="flex h-screen overflow-hidden bg-espresso">
+
+      {/* ══ LEFT — Coffee Image ══ */}
+      <div className="relative hidden lg:flex w-[42%] flex-shrink-0 overflow-hidden">
         <img
           ref={imgRef}
-          src="https://images.unsplash.com/photo-1497935586351-b67a49e012bf?auto=format&fit=crop&w=1800&q=80"
-          alt="Premium pour over coffee"
-          className="w-full h-[120%] object-cover -mt-[10%]"
+          src="https://images.unsplash.com/photo-1497935586351-b67a49e012bf?auto=format&fit=crop&w=1400&q=90"
+          alt="Coffee atmosphere"
+          className="absolute inset-0 w-full h-full object-cover scale-110"
         />
-        <div className="absolute inset-0 bg-gradient-to-l from-espresso/97 via-espresso/85 to-espresso/50" />
-        <div className="absolute inset-0 bg-gradient-to-t from-espresso via-transparent to-transparent" />
-      </div>
+        {/* Overlays */}
+        <div className="absolute inset-0 bg-gradient-to-t from-espresso via-espresso/55 to-espresso/15" />
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-espresso" />
 
-      {/* ── Floating decorations ── */}
-      <div className="absolute top-32 left-[12%] w-2 h-2 rounded-full bg-crema/20 animate-pulse" />
-      <div className="absolute top-52 left-[22%] w-1 h-1 rounded-full bg-crema/30" />
-      <div className="absolute top-72 left-[17%] w-3 h-3 rounded-full bg-rust/20 animate-pulse" style={{ animationDelay: "2s" }} />
-      <div className="absolute bottom-48 right-[8%] w-2 h-2 rounded-full bg-crema/15 animate-pulse" style={{ animationDelay: "1s" }} />
-
-      {/* ── Radial glow ── */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{ background: "radial-gradient(circle at 35% 50%, rgba(124,47,31,0.08) 0%, transparent 60%)" }}
-      />
-
-      {/* ── Main Layout ── */}
-      <div className="relative w-full max-w-[1800px] mx-auto px-6 md:px-16 lg:px-24 pt-28 pb-20 flex flex-col lg:flex-row-reverse items-center gap-16 lg:gap-24">
-
-        {/* ── Right: Branding ── */}
-        <div className="flex-1 max-w-xl">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 border border-crema/30 bg-crema/5 backdrop-blur-sm px-4 py-2 rounded-full mb-8">
-            <span className="w-1.5 h-1.5 rounded-full bg-crema animate-pulse" />
-            <span className="font-mono text-xs tracking-widest uppercase text-crema">
-              Mian Channu · Est. 2026 · Free to Join
-            </span>
+        {/* BH Badge */}
+        <Link to="/" className="absolute top-8 left-8 z-20 no-underline">
+          <div className="w-11 h-11 rounded-full border border-crema/40 bg-espresso/70 backdrop-blur-md flex items-center justify-center font-mono text-[11px] tracking-widest text-crema hover:scale-110 transition-transform">
+            bh
           </div>
+        </Link>
 
-          {/* Headline */}
-          <h1 className="font-display font-semibold text-5xl md:text-[4.5rem] leading-[1.05] mb-6">
-            Join the haven,
-            <br />
-            <span className="text-crema italic font-medium relative">
-              skip the line.
-              <svg className="absolute -bottom-2 left-0 w-full" height="6" viewBox="0 0 300 6" fill="none">
-                <path d="M0 5 Q75 0 150 5 Q225 10 300 5" stroke="#d9a54c" strokeWidth="1.5" strokeOpacity="0.5" fill="none" />
-              </svg>
-            </span>
-          </h1>
-
-          <p className="text-cream-dim text-lg leading-relaxed max-w-md mb-10">
-            Takes less than a minute. Get access to exclusive perks, order tracking, and your personal brew history.
-          </p>
-
-          {/* Perk cards */}
-          <div className="grid grid-cols-2 gap-3 mb-10">
-            {perks.map(({ icon, title, desc }) => (
-              <div
-                key={title}
-                className="bg-espresso/60 backdrop-blur-sm border border-cream/10 rounded-xl p-4 hover:border-crema/30 transition-colors"
-              >
-                <span className="text-xl mb-2 block">{icon}</span>
-                <p className="font-mono text-xs text-cream uppercase tracking-wider mb-1">{title}</p>
-                <p className="text-cream-dim text-xs leading-relaxed">{desc}</p>
-              </div>
-            ))}
-          </div>
-
-          {/* Testimonial */}
-          <div className="p-4 bg-espresso/50 backdrop-blur-sm border border-cream/10 rounded-xl">
-            <p className="text-cream-dim text-sm leading-relaxed italic">
+        {/* Bottom content */}
+        <div
+          className="absolute bottom-0 left-0 right-0 p-10 z-20"
+          style={{ animation: mounted ? "slideInLeft 0.8s ease both" : "none", animationDelay: "0.2s" }}
+        >
+          <p className="font-mono text-[10px] tracking-[0.3em] uppercase text-crema mb-4">☕ Brew Haven</p>
+          <h2 className="font-display text-4xl text-cream leading-snug mb-6">
+            Join the haven,<br />
+            <span className="text-crema italic">skip the line.</span>
+          </h2>
+          <div className="w-12 h-px bg-crema/40 mb-6" />
+          <div className="bg-white/5 border border-white/10 backdrop-blur-sm rounded-2xl p-5">
+            <p className="text-cream/55 text-sm italic leading-relaxed mb-4">
               "It's not just coffee — it's the whole experience. The space, the smell, the people. I work from here every Monday."
             </p>
-            <span className="font-mono text-[10px] uppercase tracking-widest text-crema mt-2 block">— Sara K.</span>
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-crema/20 border border-crema/30 flex items-center justify-center font-display text-crema text-sm">
+                S
+              </div>
+              <div>
+                <p className="font-mono text-[10px] tracking-widest text-crema uppercase">Sara K.</p>
+                <p className="font-mono text-[9px] text-cream/30 tracking-wider">Verified Customer</p>
+              </div>
+            </div>
           </div>
         </div>
+      </div>
 
-        {/* ── Left: Register Form ── */}
-        <div className="w-full max-w-md lg:max-w-[420px] relative">
-          {/* Form glow */}
-          <div
-            className="absolute -inset-4 rounded-3xl pointer-events-none opacity-40"
-            style={{ background: "radial-gradient(circle, rgba(124,47,31,0.12) 0%, transparent 70%)" }}
-          />
+      {/* ══ RIGHT — Form ══ */}
+      <div className="flex-1 flex flex-col items-center justify-center overflow-y-auto px-8 py-8 relative">
 
-          <div className="relative z-10 text-center mb-8">
-            <div className="w-10 h-10 mx-auto rounded-full border border-crema/40 flex items-center justify-center font-mono text-[10px] text-crema mb-4 bg-crema/5">
+        {/* Ambient glow */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-crema/[0.03] blur-3xl" />
+        </div>
+
+        {/* Mobile Logo */}
+        <div className="lg:hidden mb-6">
+          <Link to="/" className="no-underline">
+            <div className="w-12 h-12 rounded-full border border-crema/40 bg-espresso-2 flex items-center justify-center font-mono text-sm tracking-widest text-crema">
               bh
             </div>
-            <span className="font-mono text-[10px] tracking-widest uppercase text-crema mb-2 block">
-              Join Us
-            </span>
-            <h2 className="font-display text-3xl text-cream">Create your account</h2>
-            <p className="text-cream-dim text-sm mt-2">Takes less than a minute.</p>
+          </Link>
+        </div>
+
+        <div
+          className="w-full max-w-sm relative z-10"
+          style={{ animation: mounted ? "fadeUp 0.7s ease both" : "none" }}
+        >
+          {/* Desktop Logo */}
+          <div className="hidden lg:flex justify-center mb-6">
+            <Link to="/" className="no-underline">
+              <div className="w-11 h-11 rounded-full border border-crema/40 bg-espresso-2 flex items-center justify-center font-mono text-[11px] tracking-widest text-crema hover:scale-110 transition-transform">
+                bh
+              </div>
+            </Link>
           </div>
 
-          <form
-            onSubmit={handleSubmit}
-            className="relative z-10 bg-espresso-2/70 backdrop-blur-xl border border-cream/10 p-8 rounded-2xl shadow-2xl space-y-4"
-          >
-            {error && (
-              <div className="bg-rust-deep/20 border border-rust/50 text-cream text-sm px-4 py-3 rounded-lg flex items-center gap-3">
-                <span className="text-rust">⚠</span>
-                {error}
-              </div>
-            )}
+          {/* Header */}
+          <div className="text-center mb-7">
+            <p className="font-mono text-[10px] tracking-[0.3em] uppercase text-crema mb-2">Join Us</p>
+            <h1 className="font-display text-3xl text-cream mb-2">Create your account</h1>
+            <p className="text-cream/35 text-sm">Takes less than a minute.</p>
+          </div>
+
+          {/* Error */}
+          {error && (
+            <div className="mb-5 flex items-center gap-3 bg-rust/10 border border-rust/25 rounded-xl px-4 py-3">
+              <span className="text-rust text-lg">⚠</span>
+              <p className="text-rust text-sm">{error}</p>
+            </div>
+          )}
+
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="space-y-4">
 
             {/* Full Name */}
             <div>
-              <label className="font-mono text-[11px] uppercase tracking-wider text-cream-dim block mb-2">Full Name</label>
-              <input
-                type="text"
-                name="fullName"
-                required
-                value={formData.fullName}
-                onChange={handleChange}
-                placeholder="Ayesha Raza"
-                className="w-full bg-espresso border border-cream/15 px-4 py-3.5 rounded-lg text-sm outline-none focus:border-crema transition-colors placeholder:text-cream/20 text-cream"
-              />
-            </div>
-
-            {/* Email + Phone */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label className="font-mono text-[11px] uppercase tracking-wider text-cream-dim block mb-2">Email</label>
+              <label className="block font-mono text-[10px] tracking-[0.2em] uppercase text-cream/40 mb-2">Full Name</label>
+              <div className="relative group">
+                <FiUser className="absolute left-4 top-1/2 -translate-y-1/2 text-cream/25 group-focus-within:text-crema transition-colors" size={14} />
                 <input
-                  type="email"
-                  name="email"
-                  required
-                  value={formData.email}
-                  onChange={handleChange}
-                  placeholder="you@example.com"
-                  className="w-full bg-espresso border border-cream/15 px-4 py-3.5 rounded-lg text-sm outline-none focus:border-crema transition-colors placeholder:text-cream/20 text-cream"
+                  type="text" name="fullName" required
+                  value={formData.fullName} onChange={handleChange}
+                  placeholder="Ayesha Raza"
+                  className="w-full bg-espresso-2 border border-cream/10 focus:border-crema/50 rounded-xl pl-10 pr-4 py-3 text-sm text-cream placeholder-cream/20 outline-none transition-all"
                 />
               </div>
+            </div>
+
+            {/* Email + Phone row */}
+            <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="font-mono text-[11px] uppercase tracking-wider text-cream-dim block mb-2">Phone</label>
-                <input
-                  type="tel"
-                  name="phone"
-                  required
-                  value={formData.phone}
-                  onChange={handleChange}
-                  placeholder="03xx-xxxxxxx"
-                  className="w-full bg-espresso border border-cream/15 px-4 py-3.5 rounded-lg text-sm outline-none focus:border-crema transition-colors placeholder:text-cream/20 text-cream"
-                />
+                <label className="block font-mono text-[10px] tracking-[0.2em] uppercase text-cream/40 mb-2">Email</label>
+                <div className="relative group">
+                  <FiMail className="absolute left-3 top-1/2 -translate-y-1/2 text-cream/25 group-focus-within:text-crema transition-colors" size={13} />
+                  <input
+                    type="email" name="email" required
+                    value={formData.email} onChange={handleChange}
+                    placeholder="you@email.com"
+                    className="w-full bg-espresso-2 border border-cream/10 focus:border-crema/50 rounded-xl pl-9 pr-3 py-3 text-sm text-cream placeholder-cream/20 outline-none transition-all"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block font-mono text-[10px] tracking-[0.2em] uppercase text-cream/40 mb-2">Phone</label>
+                <div className="relative group">
+                  <FiPhone className="absolute left-3 top-1/2 -translate-y-1/2 text-cream/25 group-focus-within:text-crema transition-colors" size={13} />
+                  <input
+                    type="tel" name="phone" required
+                    value={formData.phone} onChange={handleChange}
+                    placeholder="03xx-xxxxxxx"
+                    className="w-full bg-espresso-2 border border-cream/10 focus:border-crema/50 rounded-xl pl-9 pr-3 py-3 text-sm text-cream placeholder-cream/20 outline-none transition-all"
+                  />
+                </div>
               </div>
             </div>
 
             {/* Password */}
             <div>
-              <label className="font-mono text-[11px] uppercase tracking-wider text-cream-dim block mb-2">Password</label>
-              <input
-                type="password"
-                name="password"
-                required
-                value={formData.password}
-                onChange={handleChange}
-                placeholder="Min. 8 characters"
-                className="w-full bg-espresso border border-cream/15 px-4 py-3.5 rounded-lg text-sm outline-none focus:border-crema transition-colors placeholder:text-cream/20 text-cream"
-              />
+              <label className="block font-mono text-[10px] tracking-[0.2em] uppercase text-cream/40 mb-2">Password</label>
+              <div className="relative group">
+                <FiLock className="absolute left-4 top-1/2 -translate-y-1/2 text-cream/25 group-focus-within:text-crema transition-colors" size={14} />
+                <input
+                  type={showPass ? "text" : "password"} name="password" required
+                  value={formData.password} onChange={handleChange}
+                  placeholder="Min. 8 characters"
+                  className="w-full bg-espresso-2 border border-cream/10 focus:border-crema/50 rounded-xl pl-10 pr-11 py-3 text-sm text-cream placeholder-cream/20 outline-none transition-all"
+                />
+                <button type="button" onClick={() => setShowPass(!showPass)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-cream/25 hover:text-crema transition-colors">
+                  {showPass ? <FiEyeOff size={14} /> : <FiEye size={14} />}
+                </button>
+              </div>
             </div>
 
             {/* Confirm Password */}
             <div>
-              <label className="font-mono text-[11px] uppercase tracking-wider text-cream-dim block mb-2">Confirm Password</label>
-              <input
-                type="password"
-                name="confirmPassword"
-                required
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                placeholder="Re-enter password"
-                className="w-full bg-espresso border border-cream/15 px-4 py-3.5 rounded-lg text-sm outline-none focus:border-crema transition-colors placeholder:text-cream/20 text-cream"
-              />
+              <label className="block font-mono text-[10px] tracking-[0.2em] uppercase text-cream/40 mb-2">Confirm Password</label>
+              <div className="relative group">
+                <FiLock className="absolute left-4 top-1/2 -translate-y-1/2 text-cream/25 group-focus-within:text-crema transition-colors" size={14} />
+                <input
+                  type={showConfirm ? "text" : "password"} name="confirmPassword" required
+                  value={formData.confirmPassword} onChange={handleChange}
+                  placeholder="Re-enter password"
+                  className="w-full bg-espresso-2 border border-cream/10 focus:border-crema/50 rounded-xl pl-10 pr-11 py-3 text-sm text-cream placeholder-cream/20 outline-none transition-all"
+                />
+                <button type="button" onClick={() => setShowConfirm(!showConfirm)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-cream/25 hover:text-crema transition-colors">
+                  {showConfirm ? <FiEyeOff size={14} /> : <FiEye size={14} />}
+                </button>
+              </div>
             </div>
 
             {/* Submit */}
             <button
-              type="submit"
-              disabled={loading}
-              className="w-full relative group overflow-hidden bg-rust hover:bg-rust-deep py-4 rounded-lg font-mono text-sm transition-all duration-300 disabled:opacity-70 mt-2"
+              type="submit" disabled={loading}
+              className={`w-full flex items-center justify-center gap-2.5 py-3.5 rounded-xl font-mono text-sm tracking-widest uppercase transition-all duration-300 mt-1 ${
+                loading
+                  ? "bg-rust/40 text-cream/40 cursor-not-allowed"
+                  : "bg-rust hover:bg-rust-deep text-cream shadow-lg shadow-rust/25 hover:shadow-rust/40 hover:scale-[1.01] active:scale-[0.99]"
+              }`}
             >
-              <span className="relative z-10 flex items-center justify-center gap-2 text-cream">
-                {loading ? (
-                  <>
-                    <span className="w-4 h-4 border-2 border-cream/30 border-t-cream rounded-full animate-spin" />
-                    Creating account...
-                  </>
-                ) : (
-                  "Create Account →"
-                )}
-              </span>
-              <div className="absolute inset-0 h-full w-0 bg-white/10 group-hover:w-full transition-all duration-300 ease-out" />
+              {loading ? (
+                <><div className="w-4 h-4 border-2 border-cream/30 border-t-cream rounded-full animate-spin" /> Creating...</>
+              ) : (
+                <>Create Account <FiArrowRight size={14} /></>
+              )}
             </button>
-
-            {/* Divider */}
-            <div className="flex items-center gap-3 pt-1">
-              <div className="flex-1 h-px bg-cream/10" />
-              <span className="font-mono text-[10px] text-cream-dim uppercase tracking-widest">or</span>
-              <div className="flex-1 h-px bg-cream/10" />
-            </div>
-
-            <p className="text-center text-sm text-cream-dim">
-              Already have an account?{" "}
-              <Link
-                to="/login"
-                className="text-crema hover:text-cream transition-colors underline underline-offset-4 decoration-crema/30 hover:decoration-crema"
-              >
-                Sign in
-              </Link>
-            </p>
           </form>
-        </div>
-      </div>
 
-      {/* ── Scroll indicator ── */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-40">
-        <span className="font-mono text-[10px] tracking-widest text-cream-dim uppercase">Scroll</span>
-        <div className="w-px h-10 bg-gradient-to-b from-cream-dim to-transparent animate-pulse" />
+          {/* Divider + Login link */}
+          <div className="flex items-center gap-3 my-5">
+            <div className="flex-1 h-px bg-cream/8" />
+            <span className="font-mono text-[9px] tracking-widest text-cream/20 uppercase">or</span>
+            <div className="flex-1 h-px bg-cream/8" />
+          </div>
+          <p className="text-center text-sm text-cream/35">
+            Already have an account?{" "}
+            <Link to="/login" className="text-crema hover:text-crema-soft underline underline-offset-4 decoration-crema/30 transition-all">
+              Sign in
+            </Link>
+          </p>
+        </div>
       </div>
 
       <style>{`
         input:-webkit-autofill,
         input:-webkit-autofill:hover,
-        input:-webkit-autofill:focus,
-        input:-webkit-autofill:active {
-          -webkit-box-shadow: 0 0 0 30px #18110c inset !important;
+        input:-webkit-autofill:focus {
+          -webkit-box-shadow: 0 0 0 60px #241a13 inset !important;
           -webkit-text-fill-color: #f4ead9 !important;
-          transition: background-color 5000s ease-in-out 0s;
+          transition: background-color 9999s;
         }
+        input::placeholder { color: rgba(244,234,217,0.18) !important; }
       `}</style>
-    </section>
+    </div>
   );
 }

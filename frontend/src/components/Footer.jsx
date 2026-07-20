@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { FaInstagram, FaFacebookF, FaTiktok, FaYoutube, FaEnvelope, FaArrowRight } from "react-icons/fa6";
+import { useSettingsStore } from "../store/settingsStore";
 
 const links = {
   Explore: [
@@ -25,6 +26,7 @@ const links = {
 const origins = ["Ethiopia", "Colombia", "Sumatra", "Kenya", "Guatemala"];
 
 export default function Footer() {
+  const { settings } = useSettingsStore();
   const scrollTo = (id) => {
     const el = document.getElementById(id);
     if (el) el.scrollIntoView({ behavior: "smooth" });
@@ -63,11 +65,11 @@ export default function Footer() {
               <span className="w-12 h-12 rounded-full border-2 border-crema/40 flex items-center justify-center font-mono text-sm text-crema group-hover:border-crema group-hover:bg-crema group-hover:text-espresso transition-all duration-500 shadow-[0_0_15px_rgba(217,165,76,0.1)]">
                 bh
               </span>
-              <span className="group-hover:text-crema transition-colors duration-300">Brew Haven</span>
+              <span className="group-hover:text-crema transition-colors duration-300">{(settings?.cafeName) || "Brew Haven"}</span>
             </Link>
 
             <p className="text-sm text-cream-dim/80 leading-relaxed max-w-sm">
-              Small-batch specialty coffee, micro-roasted every Tuesday in Mian Channu. No shortcuts, no compromises — just pure, unfiltered coffee excellence.
+              Small-batch specialty coffee, micro-roasted every Tuesday in {(settings?.location) || "Mian Channu"}. No shortcuts, no compromises — just pure, unfiltered coffee excellence.
             </p>
 
             {/* Coffee Origin Tags */}
@@ -212,9 +214,9 @@ export default function Footer() {
         <div className="py-10 flex flex-col lg:flex-row justify-between items-center gap-6 text-center lg:text-left">
           
           <div className="flex flex-col md:flex-row items-center gap-3 md:gap-6 font-mono text-[11px] text-cream-dim/60 tracking-wider">
-            <span>© {new Date().getFullYear()} BREW HAVEN COFFEE CO.</span>
+            <span>© {new Date().getFullYear()} {((settings?.cafeName) || "BREW HAVEN").toUpperCase()} COFFEE CO.</span>
             <span className="hidden md:inline text-cream/20">|</span>
-            <span>MIAN CHANNU, PAKISTAN</span>
+            <span>{((settings?.location) || "MIAN CHANNU, PAKISTAN").toUpperCase()}</span>
           </div>
 
           {/* Active status indicator badge */}
@@ -222,7 +224,7 @@ export default function Footer() {
             <span className="w-2 h-2 rounded-full bg-green-400 animate-ping" />
             <span className="w-2 h-2 rounded-full bg-green-500 absolute" />
             <span className="font-mono text-[10px] text-green-400 uppercase tracking-widest">
-              Live &amp; Brewing Today · 7:00 AM – 9:00 PM
+              Live &amp; Brewing Today · {(settings?.openingHours) || "7:00 AM – 9:00 PM (Daily)"}
             </span>
           </div>
 

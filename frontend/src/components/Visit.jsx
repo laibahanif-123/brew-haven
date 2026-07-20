@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { FaPhone, FaLocationDot, FaClock, FaPaperPlane, FaSquareArrowUpRight } from "react-icons/fa6";
+import { useSettingsStore } from "../store/settingsStore";
 
 export default function Visit() {
+  const { settings } = useSettingsStore();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -155,7 +157,7 @@ export default function Visit() {
                 </div>
                 <div>
                   <div className="font-mono text-[9px] uppercase tracking-wider text-cream-dim/50">Call Us</div>
-                  <div className="text-sm text-cream font-medium">+92 51 000 0000</div>
+                  <div className="text-sm text-cream font-medium">{settings.phone}</div>
                 </div>
               </div>
               <div className="flex items-center gap-3">
@@ -164,7 +166,7 @@ export default function Visit() {
                 </div>
                 <div>
                   <div className="font-mono text-[9px] uppercase tracking-wider text-cream-dim/50">Roastery Address</div>
-                  <div className="text-sm text-cream font-medium">GT Road, Mian Channu</div>
+                  <div className="text-sm text-cream font-medium">{settings.location}</div>
                 </div>
               </div>
             </div>
@@ -180,21 +182,14 @@ export default function Visit() {
                 <h3 className="font-display text-xl font-bold text-cream">Opening Hours</h3>
               </div>
               <div className="space-y-1 font-mono text-xs">
-                {[
-                  { day: "Monday – Friday", hours: "7:00 AM – 9:00 PM", active: true },
-                  { day: "Saturday", hours: "8:00 AM – 10:00 PM", active: false },
-                  { day: "Sunday", hours: "8:00 AM – 8:00 PM", active: false },
-                ].map(({ day, hours, active }) => (
-                  <div
-                    key={day}
-                    className={`flex justify-between items-center border-b border-white/5 py-4 last:border-0 ${
-                      active ? "text-crema-soft" : "text-cream-dim/70"
-                    }`}
-                  >
-                    <span>{day}</span>
-                    <span className="tabular-nums font-semibold">{hours}</span>
-                  </div>
-                ))}
+                <div className="flex justify-between items-center border-b border-white/5 py-4 text-crema-soft">
+                  <span>Opening Hours</span>
+                  <span className="tabular-nums font-semibold">{settings.openingHours}</span>
+                </div>
+                <div className="flex justify-between items-center border-b border-white/5 py-4 text-cream-dim/70">
+                  <span>Established</span>
+                  <span className="tabular-nums font-semibold">{settings.established}</span>
+                </div>
               </div>
 
               {/* Status Badge */}
@@ -211,10 +206,10 @@ export default function Visit() {
               <div className="flex items-center justify-between border-b border-white/5 pb-4">
                 <div className="space-y-1">
                   <h3 className="font-display text-xl font-bold text-cream">Our Location</h3>
-                  <p className="text-xs text-cream-dim/60">Come visit us in Mian Channu</p>
+                  <p className="text-xs text-cream-dim/60">Come visit us in {settings.location.split(",")[0]}</p>
                 </div>
                 <a
-                  href="https://maps.google.com/?q=Mian+Channu,+Pakistan"
+                  href={`https://maps.google.com/?q=${encodeURIComponent(settings.location)}`}
                   target="_blank"
                   rel="noreferrer"
                   className="font-mono text-[10px] uppercase tracking-wider text-crema-soft hover:text-cream flex items-center gap-1 transition-colors duration-300"

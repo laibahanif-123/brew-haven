@@ -14,6 +14,7 @@ const allowedOrigins = [
   "https://brew-haven-one.vercel.app",
   "https://brew-haven-ehzj.vercel.app",
   "https://brew-haven-c8gi.vercel.app",
+  "https://brew-haven-orcin-xi.vercel.app",
   process.env.FRONTEND_URL,
 ].filter(Boolean);
 
@@ -36,6 +37,7 @@ app.use(
 app.use("/api/users", require("./routes/userRoutes"));
 app.use("/api/products", require("./routes/productRoutes"));
 app.use("/api/orders", require("./routes/orderRoutes"));
+app.use("/api/settings", require("./routes/settingRoutes"));
 
 app.get("/", (req, res) => {
   res.send("☕ Brew Haven API is running...");

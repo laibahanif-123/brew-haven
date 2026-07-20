@@ -72,11 +72,22 @@ const updateUserProfile = async (req, res) => {
     const user = await User.findById(req.user._id);
     if (!user) return res.status(404).json({ message: "User not found" });
 
+    // Update basic profile fields
     if (req.body.name) user.name = req.body.name;
-    if (req.body.phone) user.phone = req.body.phone;
+    if (req.body.email) user.email = req.body.email;
+    if (req.body.phone !== undefined) user.phone = req.body.phone;
+
+    // Password change — requires currentPassword to be correct
     if (req.body.password) {
+      if (!req.body.currentPassword) {
+        return res.status(400).json({ message: "Current password is required to set a new password." });
+      }
+      const isMatch = await user.matchPassword(req.body.currentPassword);
+      if (!isMatch) {
+        return res.status(401).json({ message: "Current password is incorrect." });
+      }
       if (req.body.password.length < 8) {
-        return res.status(400).json({ message: "Password must be at least 8 characters" });
+        return res.status(400).json({ message: "Password must be at least 8 characters." });
       }
       user.password = req.body.password;
     }

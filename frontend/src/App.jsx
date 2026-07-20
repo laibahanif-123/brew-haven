@@ -1,5 +1,7 @@
+import { useEffect } from "react";
 import { Routes, Route, Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuthStore } from "./store/authStore";
+import { useSettingsStore } from "./store/settingsStore";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Home from "./pages/Home";
@@ -53,22 +55,42 @@ const AdminProtectedLayout = () => {
   return <Outlet />;
 };
 
+const PublicLayout = () => {
+  return (
+    <>
+      <Navbar />
+      <Outlet />
+      <Footer />
+    </>
+  );
+};
+
 function App() {
+  const fetchSettings = useSettingsStore((state) => state.fetchSettings);
+
+  useEffect(() => {
+    fetchSettings();
+  }, [fetchSettings]);
+
   return (
     <div className="font-body">
       <Routes>
-        {/* Public Routes (No Navbar/Footer) */}
+        {/* Auth Routes (No Navbar/Footer) */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
-        {/* Protected Routes (Require Login, Includes Navbar/Footer) */}
-        <Route element={<ProtectedLayout />}>
+        {/* Public Routes (Includes Navbar/Footer, no login required) */}
+        <Route element={<PublicLayout />}>
           <Route path="/" element={<Home />} />
           <Route path="/menu" element={<MenuPage />} />
           <Route path="/cart" element={<CartPage />} />
+          <Route path="/product/:id" element={<ProductDetails />} />
+        </Route>
+
+        {/* Protected Routes (Require Login, Includes Navbar/Footer) */}
+        <Route element={<ProtectedLayout />}>
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/order-success" element={<OrderSuccess />} />
-          <Route path="/product/:id" element={<ProductDetails />} />
           
           {/* User Dashboard Routes */}
           <Route element={<UserLayout />}>

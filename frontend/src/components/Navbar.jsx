@@ -57,21 +57,40 @@ export default function Navbar() {
 
         {/* Desktop Actions */}
         <div className="hidden md:flex items-center gap-5">
-          <Link 
-            to="/dashboard"
-            className="font-mono text-[10px] uppercase tracking-widest text-cream-dim hover:text-crema transition-colors"
-          >
-            Dashboard
-          </Link>
+          {/* Dashboard — only when logged in */}
+          {userInfo && !userInfo.isAdmin && (
+            <Link
+              to="/dashboard"
+              className="font-mono text-[10px] uppercase tracking-widest text-cream-dim hover:text-crema transition-colors"
+            >
+              Dashboard
+            </Link>
+          )}
+
+          {/* Admin Settings icon */}
           {userInfo?.isAdmin && (
             <Link
               to="/admin"
               title="Admin Dashboard"
-              className="relative flex items-center justify-center w-8 h-8 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500 hover:text-white transition-all duration-200"
+              className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-widest text-emerald-400 hover:text-emerald-300 transition-colors"
             >
-              <FiSettings size={15} />
+              <span className="flex items-center justify-center w-7 h-7 rounded-full bg-emerald-500/10 border border-emerald-500/30 hover:bg-emerald-500/20 transition-all">
+                <FiSettings size={13} />
+              </span>
+              Settings
             </Link>
           )}
+
+          {/* Login — only when logged out */}
+          {!userInfo && (
+            <Link
+              to="/login"
+              className="font-mono text-[10px] uppercase tracking-widest text-cream-dim hover:text-crema transition-colors"
+            >
+              Login
+            </Link>
+          )}
+
           <Link to="/cart" className="relative text-cream hover:text-crema transition">
             <FiShoppingBag size={19} />
             {totalItems > 0 && (
@@ -119,10 +138,10 @@ export default function Navbar() {
         </div>
         
         <div className="mt-10 flex flex-col gap-5 border-t border-cream/10 pt-8">
-          {userInfo && (
-            <Link 
+          {userInfo && !userInfo.isAdmin && (
+            <Link
               to="/dashboard"
-              onClick={() => setIsMobileMenuOpen(false)} 
+              onClick={() => setIsMobileMenuOpen(false)}
               className="text-left font-mono text-xs tracking-widest text-cream-dim hover:text-crema transition uppercase"
             >
               Dashboard
@@ -135,7 +154,16 @@ export default function Navbar() {
               className="flex items-center gap-3 font-mono text-xs tracking-widest text-emerald-400 uppercase hover:text-emerald-300 transition"
             >
               <FiSettings size={16} />
-              Admin Dashboard
+              Settings / Admin
+            </Link>
+          )}
+          {!userInfo && (
+            <Link
+              to="/login"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="text-left font-mono text-xs tracking-widest text-crema uppercase hover:text-cream transition"
+            >
+              Login
             </Link>
           )}
           <NavHashLink
