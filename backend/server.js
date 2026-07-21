@@ -15,6 +15,7 @@ const allowedOrigins = [
   "https://brew-haven-ehzj.vercel.app",
   "https://brew-haven-c8gi.vercel.app",
   "https://brew-haven-orcin-xi.vercel.app",
+  "https://brew-haven-y1xh.vercel.app",
   process.env.FRONTEND_URL,
 ].filter(Boolean);
 
