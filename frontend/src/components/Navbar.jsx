@@ -77,7 +77,7 @@ export default function Navbar() {
               <span className="flex items-center justify-center w-7 h-7 rounded-full bg-emerald-500/10 border border-emerald-500/30 hover:bg-emerald-500/20 transition-all">
                 <FiSettings size={13} />
               </span>
-              Settings
+              Admin Dashboard
             </Link>
           )}
 
@@ -154,7 +154,7 @@ export default function Navbar() {
               className="flex items-center gap-3 font-mono text-xs tracking-widest text-emerald-400 uppercase hover:text-emerald-300 transition"
             >
               <FiSettings size={16} />
-              Settings / Admin
+              Admin Dashboard
             </Link>
           )}
           {!userInfo && (
